@@ -1,0 +1,616 @@
+Escaped mutants:
+================
+
+
+1) /data/Dropbox/Book/Apps/todolist2/app/Commands/CategoryAdd.php:15    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+     protected $description = 'Add a new category';
+     public function handle()
+     {
+-        $this->alert('Add a category');
++        
+         $title = $this->ask('Title');
+         Category::create(['title' => $title]);
+         $this->info('Category <fg=yellow>' . $title . '</> has been added.');
+     }
+
+2) /data/Dropbox/Book/Apps/todolist2/app/Commands/CategoryEdit.php:26    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+         $newCategoryTitle = $this->ask('New title');
+         $category = Category::find(array_search($categoryTitle, $categories));
+         $category->title = $newCategoryTitle;
+-        $category->save();
++        
+         $this->info('Category <fg=yellow>' . $newCategoryTitle . '</> is updated.</>');
+     }
+ }
+
+Timed Out mutants:
+==================
+
+Not Covered mutants:
+====================
+
+
+1) /data/Dropbox/Book/Apps/todolist2/app/BaseCommands/CommandWithValidation.php:25    [M] PublicVisibility
+
+--- Original
++++ New
+@@ @@
+      * @param  string|null  $default
+      * @return mixed
+      */
+-    public function askWithValidation($question, $validationRule = null, $default = null)
++    protected function askWithValidation($question, $validationRule = null, $default = null)
+     {
+         $validator = null;
+         if ($validationRule) {
+
+
+2) /data/Dropbox/Book/Apps/todolist2/app/BaseCommands/CommandWithValidation.php:29    [M] LogicalOr
+
+--- Original
++++ New
+@@ @@
+     {
+         $validator = null;
+         if ($validationRule) {
+-            if (!class_exists(Validator::class) || !$this->app->bound('validator')) {
++            if (!class_exists(Validator::class) && !$this->app->bound('validator')) {
+                 throw new \RuntimeException('The "illuminate/validation" package is required to use validation rules');
+             }
+             $validator = function ($answer) use($question, $validationRule) {
+
+
+3) /data/Dropbox/Book/Apps/todolist2/app/BaseCommands/CommandWithValidation.php:29    [M] LogicalNot
+
+--- Original
++++ New
+@@ @@
+     {
+         $validator = null;
+         if ($validationRule) {
+-            if (!class_exists(Validator::class) || !$this->app->bound('validator')) {
++            if (!class_exists(Validator::class) || $this->app->bound('validator')) {
+                 throw new \RuntimeException('The "illuminate/validation" package is required to use validation rules');
+             }
+             $validator = function ($answer) use($question, $validationRule) {
+
+
+4) /data/Dropbox/Book/Apps/todolist2/app/BaseCommands/CommandWithValidation.php:29    [M] LogicalNot
+
+--- Original
++++ New
+@@ @@
+     {
+         $validator = null;
+         if ($validationRule) {
+-            if (!class_exists(Validator::class) || !$this->app->bound('validator')) {
++            if (class_exists(Validator::class) || !$this->app->bound('validator')) {
+                 throw new \RuntimeException('The "illuminate/validation" package is required to use validation rules');
+             }
+             $validator = function ($answer) use($question, $validationRule) {
+
+
+5) /data/Dropbox/Book/Apps/todolist2/app/BaseCommands/CommandWithValidation.php:30    [M] Throw_
+
+--- Original
++++ New
+@@ @@
+         $validator = null;
+         if ($validationRule) {
+             if (!class_exists(Validator::class) || !$this->app->bound('validator')) {
+-                throw new \RuntimeException('The "illuminate/validation" package is required to use validation rules');
++                new \RuntimeException('The "illuminate/validation" package is required to use validation rules');
+             }
+             $validator = function ($answer) use($question, $validationRule) {
+                 ValidatorFacade::make([$question => $answer], [$question => $validationRule])->validate();
+
+
+6) /data/Dropbox/Book/Apps/todolist2/app/BaseCommands/CommandWithValidation.php:34    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+                 throw new \RuntimeException('The "illuminate/validation" package is required to use validation rules');
+             }
+             $validator = function ($answer) use($question, $validationRule) {
+-                ValidatorFacade::make([$question => $answer], [$question => $validationRule])->validate();
++                
+             };
+         }
+         return $this->output->ask($question, $default, $validator);
+     }
+
+7) /data/Dropbox/Book/Apps/todolist2/app/BaseCommands/CommandWithValidation.php:34    [M] ArrayItemRemoval
+
+--- Original
++++ New
+@@ @@
+                 throw new \RuntimeException('The "illuminate/validation" package is required to use validation rules');
+             }
+             $validator = function ($answer) use($question, $validationRule) {
+-                ValidatorFacade::make([$question => $answer], [$question => $validationRule])->validate();
++                ValidatorFacade::make([$question => $answer], [])->validate();
+             };
+         }
+         return $this->output->ask($question, $default, $validator);
+     }
+
+8) /data/Dropbox/Book/Apps/todolist2/app/BaseCommands/CommandWithValidation.php:34    [M] ArrayItemRemoval
+
+--- Original
++++ New
+@@ @@
+                 throw new \RuntimeException('The "illuminate/validation" package is required to use validation rules');
+             }
+             $validator = function ($answer) use($question, $validationRule) {
+-                ValidatorFacade::make([$question => $answer], [$question => $validationRule])->validate();
++                ValidatorFacade::make([], [$question => $validationRule])->validate();
+             };
+         }
+         return $this->output->ask($question, $default, $validator);
+     }
+
+9) /data/Dropbox/Book/Apps/todolist2/app/Category.php:11    [M] PublicVisibility
+
+--- Original
++++ New
+@@ @@
+ class Category extends Model
+ {
+     protected $fillable = ['title'];
+-    public function tasks()
++    protected function tasks()
+     {
+         return $this->hasMany(Task::class);
+     }
+ }
+
+10) /data/Dropbox/Book/Apps/todolist2/app/Commands/CategoryDelete.php:13    [M] PublicVisibility
+
+--- Original
++++ New
+@@ @@
+ {
+     protected $signature = 'category:delete';
+     protected $description = 'Delete a category';
+-    public function handle()
++    protected function handle()
+     {
+         $categories = Category::pluck('title', 'id')->all();
+         if (empty($categories)) {
+
+
+11) /data/Dropbox/Book/Apps/todolist2/app/Commands/CategoryDelete.php:17    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+     {
+         $categories = Category::pluck('title', 'id')->all();
+         if (empty($categories)) {
+-            $this->warn('No categories found!');
++            
+             return;
+         }
+         $categoryTitle = $this->choice('Category', $categories);
+
+
+12) /data/Dropbox/Book/Apps/todolist2/app/Commands/CategoryDelete.php:23    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+         }
+         $categoryTitle = $this->choice('Category', $categories);
+         $category = Category::find(array_search($categoryTitle, $categories));
+-        $category->delete();
++        
+         $this->info('Category <fg=yellow>' . $categoryTitle . '</> is deleted');
+     }
+ }
+
+
+13) /data/Dropbox/Book/Apps/todolist2/app/Commands/CategoryDelete.php:25    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+         $categoryTitle = $this->choice('Category', $categories);
+         $category = Category::find(array_search($categoryTitle, $categories));
+         $category->delete();
+-        $this->info('Category <fg=yellow>' . $categoryTitle . '</> is deleted');
++        
+     }
+ }
+
+
+14) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskAdd.php:14    [M] PublicVisibility
+
+--- Original
++++ New
+@@ @@
+ {
+     protected $signature = 'task:add';
+     protected $description = 'Add a new task';
+-    public function handle()
++    protected function handle()
+     {
+         $this->alert('Add a task');
+         $title = $this->askWithValidation('Title', 'min:2|max:255');
+
+
+15) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskAdd.php:16    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+     protected $description = 'Add a new task';
+     public function handle()
+     {
+-        $this->alert('Add a task');
++        
+         $title = $this->askWithValidation('Title', 'min:2|max:255');
+         $description = $this->ask('Description');
+         $categories = Category::pluck('title', 'id')->all();
+
+
+16) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskAdd.php:22    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+         $description = $this->ask('Description');
+         $categories = Category::pluck('title', 'id')->all();
+         $category = $this->choice('Category', $categories);
+-        Task::create(['title' => $title, 'description' => $description, 'category_id' => array_search($category, $categories)]);
++        
+         $this->info('Task <fg=yellow>' . $title . '</> has been added.');
+     }
+ }
+
+
+17) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskAdd.php:22    [M] ArrayItemRemoval
+
+--- Original
++++ New
+@@ @@
+         $description = $this->ask('Description');
+         $categories = Category::pluck('title', 'id')->all();
+         $category = $this->choice('Category', $categories);
+-        Task::create(['title' => $title, 'description' => $description, 'category_id' => array_search($category, $categories)]);
++        Task::create(['description' => $description, 'category_id' => array_search($category, $categories)]);
+         $this->info('Task <fg=yellow>' . $title . '</> has been added.');
+     }
+ }
+
+
+18) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskAdd.php:25    [M] ArrayItem
+
+--- Original
++++ New
+@@ @@
+         $description = $this->ask('Description');
+         $categories = Category::pluck('title', 'id')->all();
+         $category = $this->choice('Category', $categories);
+-        Task::create(['title' => $title, 'description' => $description, 'category_id' => array_search($category, $categories)]);
++        Task::create(['title' => $title, 'description' => $description, 'category_id' > array_search($category, $categories)]);
+         $this->info('Task <fg=yellow>' . $title . '</> has been added.');
+     }
+ }
+
+
+19) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskAdd.php:28    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+         $categories = Category::pluck('title', 'id')->all();
+         $category = $this->choice('Category', $categories);
+         Task::create(['title' => $title, 'description' => $description, 'category_id' => array_search($category, $categories)]);
+-        $this->info('Task <fg=yellow>' . $title . '</> has been added.');
++        
+     }
+ }
+
+
+20) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskComplete.php:14    [M] PublicVisibility
+
+--- Original
++++ New
+@@ @@
+ {
+     protected $signature = 'task:complete {--undo}';
+     protected $description = 'Complete a task';
+-    public function handle()
++    protected function handle()
+     {
+         $tasks = Task::where('done', $this->option('undo'))->pluck('title', 'id')->all();
+         if (empty($tasks)) {
+
+
+21) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskComplete.php:18    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+     {
+         $tasks = Task::where('done', $this->option('undo'))->pluck('title', 'id')->all();
+         if (empty($tasks)) {
+-            $this->warn('No tasks left to ' . ($this->option('undo') ? 'undo' : 'do') . '!');
++            
+             return;
+         }
+         $categories = Category::pluck('title', 'id')->all();
+
+
+22) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskComplete.php:23    [M] Foreach_
+
+--- Original
++++ New
+@@ @@
+             return;
+         }
+         $categories = Category::pluck('title', 'id')->all();
+-        foreach ($categories as $categoryId => $category) {
++        foreach (array() as $categoryId => $category) {
+             $options[$category] = Task::where('done', $this->option('undo'))->where('category_id', $categoryId)->pluck('title', 'id')->all();
+         }
+         $taskId = $this->menu('Select from category', $options)->open();
+
+
+23) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskComplete.php:28    [M] LogicalNot
+
+--- Original
++++ New
+@@ @@
+             $options[$category] = Task::where('done', $this->option('undo'))->where('category_id', $categoryId)->pluck('title', 'id')->all();
+         }
+         $taskId = $this->menu('Select from category', $options)->open();
+-        if (!$taskId) {
++        if ($taskId) {
+             return;
+         }
+         $task = Task::find($taskId);
+
+
+24) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskComplete.php:33    [M] LogicalNot
+
+--- Original
++++ New
+@@ @@
+             return;
+         }
+         $task = Task::find($taskId);
+-        $task->done = !$this->option('undo');
++        $task->done = $this->option('undo');
+         $task->save();
+         $this->info('Task <fg=yellow>' . $task->title . '</> is ' . ($this->option('undo') ? 'undone' : 'completed'));
+     }
+ }
+
+25) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskComplete.php:34    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+         }
+         $task = Task::find($taskId);
+         $task->done = !$this->option('undo');
+-        $task->save();
++        
+         $this->info('Task <fg=yellow>' . $task->title . '</> is ' . ($this->option('undo') ? 'undone' : 'completed'));
+     }
+ }
+
+
+26) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskComplete.php:36    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+         $task = Task::find($taskId);
+         $task->done = !$this->option('undo');
+         $task->save();
+-        $this->info('Task <fg=yellow>' . $task->title . '</> is ' . ($this->option('undo') ? 'undone' : 'completed'));
++        
+     }
+ }
+
+
+27) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskDelete.php:13    [M] PublicVisibility
+
+--- Original
++++ New
+@@ @@
+ {
+     protected $signature = 'task:delete';
+     protected $description = 'Delete a task';
+-    public function handle()
++    protected function handle()
+     {
+         $tasks = Task::pluck('title', 'id')->all();
+         if (empty($tasks)) {
+
+
+28) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskDelete.php:17    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+     {
+         $tasks = Task::pluck('title', 'id')->all();
+         if (empty($tasks)) {
+-            $this->warn('No tasks found!');
++            
+             return;
+         }
+         $taskTitle = $this->choice('Task', $tasks);
+
+
+29) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskDelete.php:23    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+         }
+         $taskTitle = $this->choice('Task', $tasks);
+         $task = Task::find(array_search($taskTitle, $tasks));
+-        $task->delete();
++        
+         $this->info('Task <fg=yellow>' . $taskTitle . '</> is deleted');
+     }
+ }
+
+
+30) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskDelete.php:25    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+         $taskTitle = $this->choice('Task', $tasks);
+         $task = Task::find(array_search($taskTitle, $tasks));
+         $task->delete();
+-        $this->info('Task <fg=yellow>' . $taskTitle . '</> is deleted');
++        
+     }
+ }
+
+
+31) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskEdit.php:13    [M] PublicVisibility
+
+--- Original
++++ New
+@@ @@
+ {
+     protected $signature = 'task:edit';
+     protected $description = 'Edit a task';
+-    public function handle()
++    protected function handle()
+     {
+         $tasks = Task::pluck('title', 'id')->all();
+         if (empty($tasks)) {
+
+
+32) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskEdit.php:17    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+     {
+         $tasks = Task::pluck('title', 'id')->all();
+         if (empty($tasks)) {
+-            $this->warn('No tasks found!');
++            
+             return;
+         }
+         $taskTitle = $this->choice('Task', $tasks);
+
+
+33) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskEdit.php:27    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+         $task = Task::find(array_search($taskTitle, $tasks));
+         $task->title = $newTaskTitle;
+         $task->description = $newDescription;
+-        $task->save();
++        
+         $this->info('Task <fg=yellow>' . $newTaskTitle . '</> is updated</>');
+     }
+ }
+
+
+34) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskEdit.php:29    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+         $task->title = $newTaskTitle;
+         $task->description = $newDescription;
+         $task->save();
+-        $this->info('Task <fg=yellow>' . $newTaskTitle . '</> is updated</>');
++        
+     }
+ }
+
+
+35) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskUndo.php:12    [M] PublicVisibility
+
+--- Original
++++ New
+@@ @@
+ {
+     protected $signature = 'task:undo';
+     protected $description = 'Command description';
+-    public function handle()
++    protected function handle()
+     {
+         $this->call('task:complete', ['--undo' => true]);
+     }
+ }
+
+36) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskUndo.php:14    [M] TrueValue
+
+--- Original
++++ New
+@@ @@
+     protected $description = 'Command description';
+     public function handle()
+     {
+-        $this->call('task:complete', ['--undo' => true]);
++        $this->call('task:complete', ['--undo' => false]);
+     }
+ }
+
+
+37) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskUndo.php:14    [M] MethodCallRemoval
+
+--- Original
++++ New
+@@ @@
+     protected $description = 'Command description';
+     public function handle()
+     {
+-        $this->call('task:complete', ['--undo' => true]);
++        
+     }
+ }
+
+
+38) /data/Dropbox/Book/Apps/todolist2/app/Commands/TaskUndo.php:14    [M] ArrayItemRemoval
+
+--- Original
++++ New
+@@ @@
+     protected $description = 'Command description';
+     public function handle()
+     {
+-        $this->call('task:complete', ['--undo' => true]);
++        $this->call('task:complete', []);
+     }
+ }
+
+
+39) /data/Dropbox/Book/Apps/todolist2/app/Task.php:15    [M] PublicVisibility
+
+--- Original
++++ New
+@@ @@
+ {
+     protected $fillable = ['title', 'description', 'done', 'category_id'];
+     protected $attributes = ['done' => false];
+-    public function category()
++    protected function category()
+     {
+         return $this->belongsTo(Category::class);
+     }
+ }
